@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Library.Acounts
+namespace Library.Accounts
 {
     public static class Phone
     {

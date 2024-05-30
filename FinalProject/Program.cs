@@ -1,4 +1,6 @@
-using Library.Acounts;
+using Library.Accounts;
+using Library.BankOperations;
+using Library.BankOperations.Handlers;
 using Library.DB;
 using System.Net.NetworkInformation;
 
@@ -13,7 +15,7 @@ DataBase database = DataBase.GetInstance();
 Console.WriteLine("Вітаємо на головній сторінці!");
 Console.WriteLine("Увійдіть або зареєструйтесь, щоби мати можливість здійснювати прості банківські операції");
 bool isValidInput = false;
-User user;
+User user = null!;
 do
 {
     Console.WriteLine("Введіть номер телефону:");
@@ -84,12 +86,25 @@ static string CheckPass()
 
 Console.Clear();
 
-Console.WriteLine("Виберіть операцію:");
-Console.WriteLine("0. Завершити" +
+Console.WriteLine($"Вітаємо, {user.Surname} {user.Name}");
+Console.WriteLine("0. Завершити\n" +
     "1. Переглянути баланс на всіх картках\n" +
     "2. Перекази з одної картки на іншу\n" +
     "3. Поповнити телефон\n" +
     "4. Комунальні платежі\n" +
     "5. Змінити пінкод картки\n" +
     "6. Історія\n");
-string? choosenOperation = Console.ReadLine();
+string? choosenOperation;
+
+ForConsoleOperations console = new ForConsoleOperations(user, database);
+IHandler interceptors = ClientOperations.GetInterceptors(console);
+
+do
+{
+    Console.WriteLine("Виберіть операцію:");
+    choosenOperation = Console.ReadLine();
+    if (choosenOperation != null)
+        interceptors.Handle(choosenOperation);
+    else Console.WriteLine("Ви не обрали жодну операцію");
+
+} while (choosenOperation!="0");

@@ -8,16 +8,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Library.Acounts
+namespace Library.Accounts
 {
     public class User
     {
+        public int Id { get; private set; }
         public string Name { get; private set; }
         public string Surname { get; private set; }
         public string PhoneNumber { get; private set; }
 
-        private User(string name, string surname, string phoneNumber)
+        private User(int id, string name, string surname, string phoneNumber)
         {
+            Id = id;
             Name = name;
             Surname = surname;
             PhoneNumber = phoneNumber;
@@ -44,7 +46,7 @@ namespace Library.Acounts
 
         private static DataTable TakeUser(DataBase instance, string phoneNumber, string pass)
         {
-            string checkQuery = "SELECT surname, name FROM MyUser u INNER JOIN Phone p ON u.id_tel = p.id_phone WHERE p.phone_number = @PhoneNumber AND u.pass = @password;";
+            string checkQuery = "SELECT u.id_user, surname, name FROM MyUser u INNER JOIN Phone p ON u.id_tel = p.id_phone WHERE p.phone_number = @PhoneNumber AND u.pass = @password;";
             SqlParameter[] newParameters = new SqlParameter[]
             {
             new SqlParameter("@PhoneNumber", phoneNumber),
@@ -59,9 +61,10 @@ namespace Library.Acounts
         {
             if (dataTable.Rows.Count == 1)
             {
+                int id = Convert.ToInt32(dataTable.Rows[0]["id_user"]);
                 string name = dataTable.Rows[0]["name"].ToString() ?? throw new Exception("Name cannot be null");
                 string surname = dataTable.Rows[0]["surname"].ToString() ?? throw new Exception("Surname cannot be null");
-                return new User(name, surname, phoneNumber);
+                return new User(id, name, surname, phoneNumber);
             }
             else
             {

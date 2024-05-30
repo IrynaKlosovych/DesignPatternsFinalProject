@@ -51,11 +51,6 @@ namespace Library.DB
                 connection.Close();
             }
         }
-
-
-
-
-
         public DataTable SelectData(string sqlQuery, SqlParameter[]? parameters = null)
         {
             DataTable dataTable = new DataTable();
@@ -82,7 +77,6 @@ namespace Library.DB
             }
             return dataTable;
         }
-
 
         public void InsertUpdateDeleteData(string query, SqlParameter[]? parameters = null)
         {
