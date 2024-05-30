@@ -22,5 +22,57 @@ namespace Library.BankOperations
                 Console.WriteLine($"На картці {card.Key} {card.Value} грн");
             }
         }
+
+        public string ChooseOwnCard()
+        {
+            string resultCard="";
+            string? card;
+            bool ok = false;
+            do
+            {
+                Console.WriteLine("Оберіть картку, з якої знімаєте кошти:");
+                card = Console.ReadLine();
+                if (card != null)
+                {
+                    ok = Card.CheckOwnCard(Instance, card, UserInfo.Id);
+                    if (ok) resultCard = card;
+                }
+            } while (!ok);
+            return resultCard;
+        }
+
+        public string ChooseAnotherCard()
+        {
+            string resultCard = "";
+            string? card;
+            bool ok = false;
+            do
+            {
+                Console.WriteLine("Оберіть картку, куди перекидаєте кошти:");
+                card = Console.ReadLine();
+                if (card != null)
+                {
+                    ok = Card.IsExistAnotherCard(Instance, card);
+                    if (ok) resultCard = card;
+                }
+            } while (!ok);
+            return resultCard;
+        }
+        public decimal ChooseSumForTransaction()
+        {
+            bool success = false;
+            decimal resultSum = 0;
+            do
+            {
+                Console.WriteLine("Введіть суму для виконання операції:");
+                string? input = Console.ReadLine();
+                success = decimal.TryParse(input, out decimal sum);
+                if (success&&sum>0)
+                {
+                    resultSum = sum;
+                }
+            } while (!success);
+            return resultSum;
+        }
     }
 }
