@@ -1,4 +1,5 @@
-﻿using System.Net.NetworkInformation;
+using Library.DB;
+using System.Net.NetworkInformation;
 
 System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
 customCulture.NumberFormat.NumberDecimalSeparator = ".";
@@ -6,7 +7,7 @@ System.Threading.Thread.CurrentThread.CurrentCulture = customCulture;
 Console.OutputEncoding = System.Text.Encoding.Unicode;
 Console.InputEncoding = System.Text.Encoding.Unicode;
 
-
+DataBase database = DataBase.GetInstance();
 Console.WriteLine("Вітаємо на головній сторінці!");
 Console.WriteLine("Виберіть пункт для входу, щоби мати можливість здійснювати прості банківські операції:");
 Console.WriteLine("1 - реєстрація в застосунку, 2 - автентифікація");
