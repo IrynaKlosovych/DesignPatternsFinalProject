@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Data;
 
 namespace Library.DB
 {
@@ -48,6 +49,60 @@ namespace Library.DB
             if (connection != null && connection.State == System.Data.ConnectionState.Open)
             {
                 connection.Close();
+            }
+        }
+
+
+
+
+
+        public DataTable SelectData(string sqlQuery, SqlParameter[]? parameters = null)
+        {
+            DataTable dataTable = new DataTable();
+            try
+            {
+                OpenConnection();
+                SqlCommand cmd = new SqlCommand(sqlQuery, connection);
+                if (parameters != null)
+                {
+                    cmd.Parameters.AddRange(parameters);
+                }
+                using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                {
+                    adapter.Fill(dataTable);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                CloseConnection();
+            }
+            return dataTable;
+        }
+
+
+        public void InsertUpdateDeleteData(string query, SqlParameter[]? parameters = null)
+        {
+            try
+            {
+                OpenConnection();
+                SqlCommand cmd = new SqlCommand(query, connection);
+                if (parameters != null)
+                {
+                    cmd.Parameters.AddRange(parameters);
+                }
+                cmd.ExecuteNonQuery();
+            }
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            finally
+            {
+                CloseConnection();
             }
         }
     }

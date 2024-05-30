@@ -1,3 +1,4 @@
+using Library.Acounts;
 using Library.DB;
 using System.Net.NetworkInformation;
 
@@ -8,50 +9,84 @@ Console.OutputEncoding = System.Text.Encoding.Unicode;
 Console.InputEncoding = System.Text.Encoding.Unicode;
 
 DataBase database = DataBase.GetInstance();
+
 Console.WriteLine("Вітаємо на головній сторінці!");
-Console.WriteLine("Виберіть пункт для входу, щоби мати можливість здійснювати прості банківські операції:");
-Console.WriteLine("1 - реєстрація в застосунку, 2 - автентифікація");
-string? choosingNumber = Console.ReadLine();
+Console.WriteLine("Увійдіть або зареєструйтесь, щоби мати можливість здійснювати прості банківські операції");
 bool isValidInput = false;
+User user;
 do
 {
-    if(choosingNumber==null)
+    Console.WriteLine("Введіть номер телефону:");
+    string? phoneNumber = Console.ReadLine();
+    if (phoneNumber == null || !Phone.IsValidMobilePhoneNumber(phoneNumber))
     {
-        Console.WriteLine("Ви не ввели відповідь");
+        Console.WriteLine("Ви не ввели номер телефону або номер не валідний");
     }
     else
     {
-        switch (choosingNumber)
+        if (Phone.IsExistPhoneInDB(database, phoneNumber))
         {
-            case "1":
-                Console.WriteLine("Введіть номер телефону:");
-                //Check phone number
-
-                Console.WriteLine("Введіть пароль:");
-
+            Console.WriteLine("Акаунт уже існує");
+            string pass = CheckPass();
+            try
+            {
+                user = User.Authentication(database, phoneNumber, pass);
+                isValidInput = true;
+            }
+            catch
+            {
+                Console.WriteLine($"Деяка помилка, введіть дані знову");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Акаунт не існує, створімо його");
+            string? pass2;
+            string mainPass = CheckPass();
+            do
+            {
                 Console.WriteLine("Введіть ще раз пароль:");
-                //compare passwords
-
+                pass2 = Console.ReadLine();
+                if (!Password.ComparePasswords(mainPass, pass2))
+                {
+                    Console.WriteLine("Паролі не збігаються");
+                }
+            } while (!Password.ComparePasswords(mainPass, pass2));
+            try
+            {
+                user = User.Registry(database, phoneNumber, mainPass);
                 isValidInput = true;
-                break;
-            case "2":
-                Console.WriteLine("Введіть номер телефону:");
-                //Check phone number
+            }
+            catch
+            {
+                Console.WriteLine($"Деяка помилка, введіть дані знову");
+            }
 
-                Console.WriteLine("Введіть пароль:");
-                //check have user this number + pass
-
-                isValidInput = true;
-                break;
-            default:
-                Console.WriteLine("Невірний вибір. Будь ласка, виберіть 1 або 2.");
-                break;
         }
     }
 } while (!isValidInput);
+
+static string CheckPass()
+{
+    string? pass;
+    do
+    {
+        Console.WriteLine("Введіть пароль (більше 7 знаків, повинен містити цифри та літери):");
+        pass = Console.ReadLine();
+
+        if (!Password.IsValidPass(pass))
+        {
+            Console.WriteLine("Пароль не валідний");
+        }
+    } while (!Password.IsValidPass(pass));
+    return pass!;
+}
+
 Console.Clear();
+
 Console.WriteLine("Виберіть операцію:");
-Console.WriteLine("1. Переглянути баланс на всіх картках\n" +
+Console.WriteLine("0. Завершити" +
+    "1. Переглянути баланс на всіх картках\n" +
     "2. Перекази з одної картки на іншу\n" +
     "3. Поповнити телефон\n" +
     "4. Комунальні платежі\n" +
