@@ -11,8 +11,10 @@ namespace Library.BankOperations.Handlers
     {
         public static IHandler GetInterceptors(ForConsoleOperations console)
         {
-            var first = new CardsBalanceHandler(console)
-                .SetNext(new AddMoneyToAnotherCard(console));
+            var first = new CardsBalanceHandler(console);
+
+            first.SetNext(new AddMoneyToAnotherCard(console))
+                .SetNext(new AddMoneyToPhone(console));
             return first;
         }
     }

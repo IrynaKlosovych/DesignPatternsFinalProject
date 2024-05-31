@@ -86,25 +86,28 @@ static string CheckPass()
 
 Console.Clear();
 
-Console.WriteLine($"Вітаємо, {user.Surname} {user.Name}");
-Console.WriteLine("0. Завершити\n" +
-    "1. Переглянути баланс на всіх картках\n" +
-    "2. Перекази з одної картки на іншу\n" +
-    "3. Поповнити телефон\n" +
-    "4. Комунальні платежі\n" +
-    "5. Змінити пінкод картки\n" +
-    "6. Історія\n");
 string? choosenOperation;
-
 ForConsoleOperations console = new ForConsoleOperations(user, database);
 IHandler interceptors = ClientOperations.GetInterceptors(console);
 
 do
 {
-    Console.WriteLine("Виберіть операцію:");
+    Console.WriteLine($"Вітаємо, {user.Surname} {user.Name}");
+    Console.WriteLine("0. Завершити\n" +
+        "1. Переглянути баланс на всіх картках\n" +
+        "2. Перекази з одної картки на іншу\n" +
+        "3. Поповнити телефон\n" +
+        "4. Комунальні платежі\n" +
+        "5. Змінити пінкод картки\n" +
+        "6. Історія\n");
+    Console.WriteLine("Виберіть операцію(введіть цифру):");
+
     choosenOperation = Console.ReadLine();
+
     if (choosenOperation != null)
         interceptors.Handle(choosenOperation);
     else Console.WriteLine("Ви не обрали жодну операцію");
 
+    Console.ReadKey();
+    Console.Clear();
 } while (choosenOperation!="0");

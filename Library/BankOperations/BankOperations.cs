@@ -6,18 +6,21 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Library.Accounts;
 
 namespace Library.BankOperations
 {
     public static class BankOperations
     {
-        private static void AddMoney(string numberCard, decimal sum)
+        public static void UpdateMoney(DataBase instance, string numberCard, decimal sum)
         {
-
-        }
-        private static void WithdrawMoney(string numberCard, decimal sum)
-        {
-
+            string query = "UPDATE CARD SET balance = balance+@newBalance WHERE card_number= @card;";
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+            new SqlParameter("@newBalance", sum),
+            new SqlParameter("@card", numberCard)
+            };
+            instance.InsertUpdateDeleteData(query, parameters);
         }
         public static Dictionary<string, decimal> CheckBalanceOnAllCards(DataBase instance, int idUser)
         {

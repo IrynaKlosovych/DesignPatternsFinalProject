@@ -64,5 +64,18 @@ namespace Library.Accounts
                 throw new Exception();
             }
         }
+
+        public static void AddTransactionWithCardToHistory(DataBase instance, DateTime dateTime, string description, decimal sum, string numCard)
+        {
+            string query = "insert into History(date, description, suma, id_user, id_card) values(@Date, @Description, @sum, (select u.id_user from MyUser u inner join CARD c on u.id_user=c.id_user where card_number= @card), (select id_card from CARD  where card_number= @card))";
+            SqlParameter[] parameters = new SqlParameter[]
+           {
+            new SqlParameter("@Date", dateTime),
+            new SqlParameter("@Description", description),
+            new SqlParameter("@sum", sum),
+            new SqlParameter("@card", numCard)
+           };
+            instance.InsertUpdateDeleteData(query, parameters);
+        }
     }
 }

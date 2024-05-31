@@ -67,12 +67,35 @@ namespace Library.BankOperations
                 Console.WriteLine("Введіть суму для виконання операції:");
                 string? input = Console.ReadLine();
                 success = decimal.TryParse(input, out decimal sum);
-                if (success&&sum>0)
+                if (success&&sum>=0)
                 {
                     resultSum = sum;
                 }
             } while (!success);
             return resultSum;
         }
+
+        public void ShowResultOfOperation(string description)
+        {
+            Console.WriteLine(description);
+        }
+
+        public string ChoosePhoneNumber()
+        {
+            string resultPhone= "";
+            string? phone;
+            bool ok = false;
+            do
+            {
+                Console.WriteLine("Оберіть номер телефону, який поповнюєте:");
+                phone = Console.ReadLine();
+                if (phone != null)
+                {
+                    ok = Phone.CheckPhone(Instance, phone);
+                    if (ok) resultPhone = phone;
+                }
+            } while (!ok);
+            return resultPhone;
+        } 
     }
 }
