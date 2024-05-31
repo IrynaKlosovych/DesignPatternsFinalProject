@@ -97,5 +97,22 @@ namespace Library.BankOperations
             } while (!ok);
             return resultPhone;
         } 
+        public string ChoosePinCode()
+        {
+            string resultPin = "";
+            string? pin;
+            bool ok = false;
+            do
+            {
+                Console.WriteLine("Введіть новий пінкод:");
+                pin = Console.ReadLine();
+                if (pin != null)
+                {
+                    ok = Card.CheckPinCodeWriting(pin);
+                    if (ok) resultPin = pin;
+                }
+            } while (!ok);
+            return resultPin;
+        }
     }
 }

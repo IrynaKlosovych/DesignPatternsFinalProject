@@ -14,7 +14,8 @@ namespace Library.BankOperations.Handlers
             var first = new CardsBalanceHandler(console);
 
             first.SetNext(new AddMoneyToAnotherCard(console))
-                .SetNext(new AddMoneyToPhone(console));
+                .SetNext(new AddMoneyToPhone(console))
+                .SetNext(new ChangePinCode(console));
             return first;
         }
     }

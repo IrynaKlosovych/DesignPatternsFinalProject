@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Library.DB;
+using System.Text.RegularExpressions;
 
 namespace Library.Accounts
 {
@@ -73,6 +74,22 @@ namespace Library.Accounts
             new SqlParameter("@Date", dateTime),
             new SqlParameter("@Description", description),
             new SqlParameter("@sum", sum),
+            new SqlParameter("@card", numCard)
+           };
+            instance.InsertUpdateDeleteData(query, parameters);
+        }
+        public static bool CheckPinCodeWriting(string pincode)
+        {
+            string pattern = @"^\d{4}$";
+            return Regex.IsMatch(pincode, pattern);
+        }
+
+        public static void ChangePin(DataBase instance, string pincode, string numCard)
+        {
+            string query = "update CARD set pincode = @pin where card_number=@card";
+            SqlParameter[] parameters = new SqlParameter[]
+           {
+            new SqlParameter("@pin", pincode),
             new SqlParameter("@card", numCard)
            };
             instance.InsertUpdateDeleteData(query, parameters);
