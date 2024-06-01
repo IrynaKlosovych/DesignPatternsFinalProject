@@ -107,7 +107,7 @@ do
     if (choosenOperation != null)
         interceptors.Handle(choosenOperation);
     else Console.WriteLine("Ви не обрали жодну операцію");
-
+    Console.WriteLine("Введіть Enter");
     Console.ReadKey();
     Console.Clear();
 } while (choosenOperation!="0");

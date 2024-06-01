@@ -49,5 +49,16 @@ namespace Library.BankOperations
             }
         }
         
+        public static DataTable ShowHistory(DataBase instance, int userID)
+        {
+            string query = "select date, description, suma, card_number from History inner join CARD on History.id_card = CARD.id_card where History.id_user = @id";
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+            new SqlParameter("@id", userID)
+            };
+
+            DataTable result = instance.SelectData(query, parameters);
+            return result;
+        }
     }
 }

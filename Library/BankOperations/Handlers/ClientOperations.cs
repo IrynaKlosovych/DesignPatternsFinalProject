@@ -15,7 +15,8 @@ namespace Library.BankOperations.Handlers
 
             first.SetNext(new AddMoneyToAnotherCard(console))
                 .SetNext(new AddMoneyToPhone(console))
-                .SetNext(new ChangePinCode(console));
+                .SetNext(new ChangePinCode(console))
+                .SetNext(new ShowHistory(console));
             return first;
         }
     }

@@ -2,6 +2,7 @@
 using Library.DB;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -113,6 +114,22 @@ namespace Library.BankOperations
                 }
             } while (!ok);
             return resultPin;
+        }
+
+        public void ShowHistory(DataTable history)
+        {
+            int dateWidth = 20;
+            int descriptionWidth = 100;
+            int sumaWidth = 10;
+            int cardNumberWidth = 20;
+
+            Console.WriteLine($"{"Дата".PadRight(dateWidth)} | {"Опис".PadRight(descriptionWidth)} | {"Сума".PadRight(sumaWidth)} | {"Картка".PadRight(cardNumberWidth)}");
+            Console.WriteLine(new string('-', dateWidth + descriptionWidth + sumaWidth + cardNumberWidth));
+
+            foreach (DataRow row in history.Rows)
+            {
+                Console.WriteLine($"{row["date"].ToString()!.PadRight(dateWidth)} | {row["description"].ToString()!.PadRight(descriptionWidth)} | {row["suma"].ToString()!.PadRight(sumaWidth)} | {row["card_number"].ToString()!.PadRight(cardNumberWidth)}");
+            }
         }
     }
 }
