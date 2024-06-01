@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace Library.Acounts
+namespace Library.Accounts
 {
     public static class Phone
     {
@@ -31,6 +31,33 @@ namespace Library.Acounts
                 return true;
             }
             return false;
+        }
+
+        public static bool CheckPhone(DataBase instance, string phoneNumber)
+        {
+            string query = "SELECT id_phone FROM Phone WHERE phone_number = @PhoneNumber;";
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+            new SqlParameter("@PhoneNumber", phoneNumber)
+            };
+
+            DataTable result = instance.SelectData(query, parameters);
+            if (result.Rows.Count == 1)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static void AddMoneyToPhone(DataBase instance, string phoneNumber, decimal sum)
+        {
+            string query = "update Phone set suma=suma+@sum where phone_number = @phone";
+            SqlParameter[] parameters = new SqlParameter[]
+            {
+            new SqlParameter("@sum", sum),
+            new SqlParameter("@phone", phoneNumber)
+            };
+            instance.InsertUpdateDeleteData(query, parameters);
         }
     }
 }
