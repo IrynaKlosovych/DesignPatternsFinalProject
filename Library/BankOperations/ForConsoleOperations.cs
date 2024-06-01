@@ -1,4 +1,5 @@
 ﻿using Library.Accounts;
+using Library.BankOperations.PaymentServiceStrategy;
 using Library.DB;
 using System;
 using System.Collections.Generic;
@@ -76,7 +77,7 @@ namespace Library.BankOperations
             return resultSum;
         }
 
-        public void ShowResultOfOperation(string description)
+        public static void ShowResultOfOperation(string description)
         {
             Console.WriteLine(description);
         }
@@ -130,6 +131,72 @@ namespace Library.BankOperations
             {
                 Console.WriteLine($"{row["date"].ToString()!.PadRight(dateWidth)} | {row["description"].ToString()!.PadRight(descriptionWidth)} | {row["suma"].ToString()!.PadRight(sumaWidth)} | {row["card_number"].ToString()!.PadRight(cardNumberWidth)}");
             }
+        }
+
+        public int ChooseHomeForCommunalPayment()
+        {
+            int result=0;
+            string? city;
+            string? street;
+            string? home;
+            bool ok = false;
+            do
+            {
+                Console.WriteLine("Приклад введення даних: Київ Шевчека 10А");
+                Console.WriteLine("Введіть місто:");
+                city = Console.ReadLine();   
+                Console.WriteLine("Введіть вулицю:");
+                street = Console.ReadLine();               
+                Console.WriteLine("Введіть будинок(квартиру):");
+                home = Console.ReadLine();
+                if (city != null && street !=null && home!=null)
+                {
+                    var some = User.CheckHomeUser(Instance, city, street, home);
+                    if (some.ContainsKey(true))
+                    {
+                        result = some[true];
+                        ok=true;
+                    }
+                }
+            } while (!ok);
+            return result;
+        }
+
+        public void ShowCommunalInfo(int residence)
+        {
+            var result = User.ShowCommunalForPayment(Instance, residence);
+            Console.WriteLine($"Газ: {result["gas"]}\nЕлектрика: {result["electricity"]}\nІнтернет: {result["internet"]}");
+        }
+
+        public List<IServicePaymentStrategy> CheckSumForPayment(decimal ownBalance, int residenceID, string card)
+        {
+            List<IServicePaymentStrategy> result = new List<IServicePaymentStrategy>();
+            bool success1, success2, success3 = false;
+            decimal gas = 0, electricity = 0, internet = 0, sum=0;
+            do
+            {
+                Console.WriteLine("Введіть оплату за газ:");
+                string? input = Console.ReadLine();
+                success1 = decimal.TryParse(input, out gas); 
+                Console.WriteLine("Введіть оплату за електрику:");
+                input = Console.ReadLine();
+                success2 = decimal.TryParse(input, out electricity);
+                Console.WriteLine("Введіть оплату за інтернет:");
+                input = Console.ReadLine();
+                success3 = decimal.TryParse(input, out internet);
+                sum=gas+electricity+internet;
+                if (sum > ownBalance)
+                {
+                    Console.WriteLine($"Загальна сума {sum} перевищує ваш баланс {ownBalance}. Будь ласка, спробуйте ще раз.");
+                }
+                else
+                {
+                    if (success1) result.Add(new GasPaymentStrategy(gas, residenceID, card, Instance));
+                    if (success2) result.Add(new ElectricityPaymentStrategy(electricity, residenceID, card, Instance));
+                    if (success3) result.Add(new InternetPaymentStrategy(internet, residenceID, card, Instance));
+                }
+            } while (sum>ownBalance);
+            return result;
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Library.BankOperations.Handlers.Steps
                 Card.ChangePin(consoleOperations.Instance, pincode, ownCard);
 
                 string description = $"Ви змінили пінкод на картці {ownCard}";
-                consoleOperations.ShowResultOfOperation(description);
+                ForConsoleOperations.ShowResultOfOperation(description);
             }
             else
             {

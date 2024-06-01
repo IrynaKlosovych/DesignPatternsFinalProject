@@ -45,7 +45,7 @@ namespace Library.BankOperations.Handlers.Steps
                     DateTime.Now, anotherdescription,
                     sumForTransaction, anotherCard);
 
-                consoleOperations.ShowResultOfOperation(owndescription);
+                ForConsoleOperations.ShowResultOfOperation(owndescription);
             }
             else
             {

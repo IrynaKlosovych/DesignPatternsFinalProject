@@ -71,5 +71,51 @@ namespace Library.Accounts
                 throw new Exception();
             }
         }
+
+        public static Dictionary<bool, int> CheckHomeUser(DataBase instance, string city, string street, string home)
+        {
+            string checkQuery = "select id_residence from Residence where city = @city and street = @street and home = @home";
+            SqlParameter[] newParameters = new SqlParameter[]
+            {
+            new SqlParameter("@city", city),
+            new SqlParameter("@street", street),
+            new SqlParameter("@home", home)
+            };
+
+            DataTable result = instance.SelectData(checkQuery, newParameters);
+            Dictionary<bool, int> res = new Dictionary<bool, int>();
+            if (result.Rows.Count == 1)
+            {
+                res.Add(true, Convert.ToInt32(result.Rows[0]["id_residence"]));
+            }
+            else
+            {
+                res.Add(false, 0);
+            }
+            return res;
+        }
+
+        public static Dictionary<string, string> ShowCommunalForPayment(DataBase instance, int id)
+        {
+            Dictionary<string, string> resultDictionary = new Dictionary<string, string>();
+            string checkQuery = "select gas, electricity, internet from Residence where id_residence = @id";
+            SqlParameter[] newParameters = new SqlParameter[]
+            {
+            new SqlParameter("@id", id),
+            };
+
+            DataTable result = instance.SelectData(checkQuery, newParameters);
+            if (result.Rows.Count == 1)
+            {
+                resultDictionary["gas"] = result.Rows[0]["gas"].ToString()!;
+                resultDictionary["electricity"] = result.Rows[0]["electricity"].ToString()!;
+                resultDictionary["internet"] = result.Rows[0]["internet"].ToString()!;
+                return resultDictionary;
+            }
+            else
+            {
+                throw new Exception();
+            }
+        }
     }
 }
