@@ -32,7 +32,7 @@ namespace Library.BankOperations
             bool ok = false;
             do
             {
-                Console.WriteLine("Оберіть картку, з якої знімаєте кошти:");
+                Console.WriteLine("Оберіть свою картку:");
                 card = Console.ReadLine();
                 if (card != null)
                 {
