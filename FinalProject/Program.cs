@@ -1,7 +1,9 @@
 using Library.Accounts;
 using Library.BankOperations;
 using Library.BankOperations.Handlers;
+using Library.BankOperations.PaymentServiceStrategy;
 using Library.DB;
+using Library.Template;
 using System.Net.NetworkInformation;
 
 System.Globalization.CultureInfo customCulture = (System.Globalization.CultureInfo)System.Threading.Thread.CurrentThread.CurrentCulture.Clone();
@@ -14,102 +16,76 @@ DataBase database = DataBase.GetInstance();
 
 Console.WriteLine("Вітаємо на головній сторінці!");
 Console.WriteLine("Увійдіть або зареєструйтесь, щоби мати можливість здійснювати прості банківські операції");
-bool isValidInput = false;
-User user = null!;
-do
-{
-    Console.WriteLine("Введіть номер телефону:");
-    string? phoneNumber = Console.ReadLine();
-    if (phoneNumber == null || !Phone.IsValidMobilePhoneNumber(phoneNumber))
-    {
-        Console.WriteLine("Ви не ввели номер телефону або номер не валідний");
-    }
-    else
-    {
-        var phoneService = new Phone(database);
 
-        if (phoneService.IsExistPhoneInDB(phoneNumber))
-        {
-            Console.WriteLine("Акаунт уже існує");
-            string pass = CheckPass();
-            try
-            {
-                user = User.Authentication(database, phoneNumber, pass);
-                isValidInput = true;
-            }
-            catch
-            {
-                Console.WriteLine($"Деяка помилка, введіть дані знову");
-            }
-        }
-        else
-        {
-            Console.WriteLine("Акаунт не існує, створімо його");
-            string? pass2;
-            string mainPass = CheckPass();
-            do
-            {
-                Console.WriteLine("Введіть ще раз пароль:");
-                pass2 = Console.ReadLine();
-                if (!Password.ComparePasswords(mainPass, pass2))
-                {
-                    Console.WriteLine("Паролі не збігаються");
-                }
-            } while (!Password.ComparePasswords(mainPass, pass2));
-            try
-            {
-                user = User.Registry(database, phoneNumber, mainPass);
-                isValidInput = true;
-            }
-            catch
-            {
-                Console.WriteLine($"Деяка помилка, введіть дані знову");
-            }
-
-        }
-    }
-} while (!isValidInput);
-
-static string CheckPass()
-{
-    string? pass;
-    do
-    {
-        Console.WriteLine("Введіть пароль (більше 7 знаків, повинен містити цифри та літери):");
-        pass = Console.ReadLine();
-
-        if (!Password.IsValidPass(pass))
-        {
-            Console.WriteLine("Пароль не валідний");
-        }
-    } while (!Password.IsValidPass(pass));
-    return pass!;
-}
-
+User user = AuthenticateOrRegisterUser(database);
 Console.Clear();
 
-string? choosenOperation;
 ForConsoleOperations console = new ForConsoleOperations(user, database);
 IHandler interceptors = ClientOperations.GetInterceptors(console);
 
-do
+MainMenu(user, interceptors);
+
+static User AuthenticateOrRegisterUser(DataBase database)
+{
+    while (true)
+    {
+        Console.WriteLine("Введіть номер телефону:");
+        string? phoneNumber = Console.ReadLine();
+        if (phoneNumber == null || !Phone.IsValidMobilePhoneNumber(phoneNumber))
+        {
+            Console.WriteLine("Ви не ввели номер телефону або номер не валідний");
+            continue;
+        }
+
+        var phoneService = new Phone(database);
+        UserOperation userOperation = phoneService.IsExistPhoneInDB(phoneNumber)
+            ? new AuthenticateUserOperation(database)
+            : new RegisterUserOperation(database);
+
+        User user = userOperation.Execute(phoneNumber);
+        if (user != null)
+        {
+            return user;
+        }
+       
+    }
+}
+
+
+
+static void MainMenu(User user, IHandler interceptors)
+{
+    string? choosenOperation;
+
+    do
+    {
+        DisplayMenu(user);
+        choosenOperation = Console.ReadLine();
+
+        if (choosenOperation != null)
+        {
+            interceptors.Handle(choosenOperation);
+        }
+        else
+        {
+            Console.WriteLine("Ви не обрали жодну операцію");
+        }
+
+        Console.WriteLine("Введіть Enter");
+        Console.ReadKey();
+        Console.Clear();
+    } while (choosenOperation != "0");
+}
+
+static void DisplayMenu(User user)
 {
     Console.WriteLine($"Вітаємо, {user.Surname} {user.Name}");
     Console.WriteLine("0. Завершити\n" +
-        "1. Переглянути баланс на всіх картках\n" +
-        "2. Перекази з одної картки на іншу\n" +
-        "3. Поповнити телефон\n" +
-        "4. Комунальні платежі(оплата)\n" +
-        "5. Змінити пінкод картки\n" +
-        "6. Історія\n");
+                      "1. Переглянути баланс на всіх картках\n" +
+                      "2. Перекази з одної картки на іншу\n" +
+                      "3. Поповнити телефон\n" +
+                      "4. Комунальні платежі(оплата)\n" +
+                      "5. Змінити пінкод картки\n" +
+                      "6. Історія\n");
     Console.WriteLine("Виберіть операцію(введіть цифру):");
-
-    choosenOperation = Console.ReadLine();
-
-    if (choosenOperation != null)
-        interceptors.Handle(choosenOperation);
-    else Console.WriteLine("Ви не обрали жодну операцію");
-    Console.WriteLine("Введіть Enter");
-    Console.ReadKey();
-    Console.Clear();
-} while (choosenOperation!="0");
+}
