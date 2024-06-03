@@ -1,17 +1,11 @@
-﻿using Library.Accounts;
-using Library.DB;
-using System;
-using System.Collections.Generic;
+﻿using Library.DB;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Library.BankOperations.PaymentServiceStrategy
 {
     public class InternetPaymentStrategy : BasePaymentStrategy
     {
-        public InternetPaymentStrategy(decimal sum, int idResidence, string card, DataBase instance)
+        public InternetPaymentStrategy(decimal sum, int idResidence, string card, IDataBase instance)
             : base(sum, idResidence, card, instance)
         {
         }

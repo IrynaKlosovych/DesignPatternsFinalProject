@@ -24,7 +24,10 @@ namespace Library.BankOperations.Handlers.Steps
                 int residence = consoleOperations.ChooseHomeForCommunalPayment();
                 consoleOperations.ShowCommunalInfo(residence);
                 string ownCard = consoleOperations.ChooseOwnCard();
-                decimal cardBalance = Card.TakeBalanceFromCard(consoleOperations.Instance, ownCard, consoleOperations.UserInfo.Id);
+
+                var cardService = new Card(consoleOperations.Instance);
+                decimal cardBalance = cardService.TakeBalanceFromCard(ownCard, consoleOperations.UserInfo.Id);
+
                 List<IServicePaymentStrategy> strategies = consoleOperations.CheckSumForPayment(cardBalance, residence, ownCard);
                 PaymentService paymentService = new PaymentService(new MultipleServicesPaymentStrategy(strategies));
                 paymentService.MakePayment();

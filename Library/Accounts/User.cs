@@ -1,12 +1,6 @@
 ﻿using Library.DB;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Library.Accounts
 {
@@ -25,34 +19,33 @@ namespace Library.Accounts
             PhoneNumber = phoneNumber;
         }
 
-        public static User Registry(DataBase instance, string phoneNumber, string pass)
+        public static User Registry(IDataBase database, string phoneNumber, string pass)
         {
-            SqlParameter[] parameters = new SqlParameter[]
+            SqlParameter[] parameters =
             {
-            new SqlParameter("@pass", pass),
-            new SqlParameter("@phone", phoneNumber)
+                new SqlParameter("@pass", pass),
+                new SqlParameter("@phone", phoneNumber)
             };
-            instance.InsertUpdateDeleteData(SqlQueries.IsExistPhoneInDBQuery, parameters);
-            DataTable result = TakeUser(instance, phoneNumber, pass);
+            database.InsertUpdateDeleteData(SqlQueries.IsExistPhoneInDBQuery, parameters);
+            DataTable result = TakeUser(database, phoneNumber, pass);
             return CreateUserFromDataTable(result, phoneNumber);
         }
 
-        public static User Authentication(DataBase instance, string phoneNumber, string password)
+        public static User Authentication(IDataBase database, string phoneNumber, string password)
         {
-            DataTable result = TakeUser(instance, phoneNumber, password);
+            DataTable result = TakeUser(database, phoneNumber, password);
             return CreateUserFromDataTable(result, phoneNumber);
         }
 
-        private static DataTable TakeUser(DataBase instance, string phoneNumber, string pass)
+        private static DataTable TakeUser(IDataBase database, string phoneNumber, string pass)
         {
-            SqlParameter[] newParameters = new SqlParameter[]
+            SqlParameter[] parameters =
             {
-            new SqlParameter("@PhoneNumber", phoneNumber),
-            new SqlParameter("@password", pass)
+                new SqlParameter("@PhoneNumber", phoneNumber),
+                new SqlParameter("@password", pass)
             };
 
-            DataTable result = instance.SelectData(SqlQueries.CheckUserQuery, newParameters);
-            return result;
+            return database.SelectData(SqlQueries.CheckUserQuery, parameters);
         }
 
         private static User CreateUserFromDataTable(DataTable dataTable, string phoneNumber)
@@ -66,21 +59,21 @@ namespace Library.Accounts
             }
             else
             {
-                throw new Exception();
+                throw new Exception("User not found");
             }
         }
 
-        public static Dictionary<bool, int> CheckHomeUser(DataBase instance, string city, string street, string home)
+        public static Dictionary<bool, int> CheckHomeUser(IDataBase database, string city, string street, string home)
         {
-            SqlParameter[] newParameters = new SqlParameter[]
+            SqlParameter[] parameters =
             {
-            new SqlParameter("@city", city),
-            new SqlParameter("@street", street),
-            new SqlParameter("@home", home)
+                new SqlParameter("@city", city),
+                new SqlParameter("@street", street),
+                new SqlParameter("@home", home)
             };
 
-            DataTable result = instance.SelectData(SqlQueries.CheckHomeUserQuery, newParameters);
-            Dictionary<bool, int> res = new Dictionary<bool, int>();
+            DataTable result = database.SelectData(SqlQueries.CheckHomeUserQuery, parameters);
+            var res = new Dictionary<bool, int>();
             if (result.Rows.Count == 1)
             {
                 res.Add(true, Convert.ToInt32(result.Rows[0]["id_residence"]));
@@ -92,25 +85,25 @@ namespace Library.Accounts
             return res;
         }
 
-        public static Dictionary<string, string> ShowCommunalForPayment(DataBase instance, int id)
+        public static Dictionary<string, string> ShowCommunalForPayment(IDataBase database, int id)
         {
-            Dictionary<string, string> resultDictionary = new Dictionary<string, string>();
-            SqlParameter[] newParameters = new SqlParameter[]
+            var resultDictionary = new Dictionary<string, string>();
+            SqlParameter[] parameters =
             {
-            new SqlParameter("@id", id),
+                new SqlParameter("@id", id)
             };
 
-            DataTable result = instance.SelectData(SqlQueries.ShowCommunalForPaymentQuery, newParameters);
+            DataTable result = database.SelectData(SqlQueries.ShowCommunalForPaymentQuery, parameters);
             if (result.Rows.Count == 1)
             {
-                resultDictionary["gas"] = result.Rows[0]["gas"].ToString()!;
-                resultDictionary["electricity"] = result.Rows[0]["electricity"].ToString()!;
-                resultDictionary["internet"] = result.Rows[0]["internet"].ToString()!;
+                resultDictionary["gas"] = result.Rows[0]["gas"].ToString();
+                resultDictionary["electricity"] = result.Rows[0]["electricity"].ToString();
+                resultDictionary["internet"] = result.Rows[0]["internet"].ToString();
                 return resultDictionary;
             }
             else
             {
-                throw new Exception();
+                throw new Exception("Communal payment details not found");
             }
         }
     }

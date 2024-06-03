@@ -1,10 +1,5 @@
 ﻿using Library.DB;
 using Library.Accounts;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Library.BankOperations.PaymentServiceStrategy
 {
@@ -13,9 +8,9 @@ namespace Library.BankOperations.PaymentServiceStrategy
         protected decimal _sum;
         protected int _id;
         protected string _card;
-        protected DataBase instance;
+        protected IDataBase instance;
 
-        public BasePaymentStrategy(decimal sum, int idResidence, string card, DataBase instance)
+        public BasePaymentStrategy(decimal sum, int idResidence, string card, IDataBase instance)
         {
             _sum = sum;
             _id = idResidence;
@@ -26,9 +21,10 @@ namespace Library.BankOperations.PaymentServiceStrategy
         public void Pay()
         {
             ExecutePayment();
-            BankOperations.UpdateMoney(instance, _card, -_sum);
+            BankOperations.UpdateMoney((DataBase)instance, _card, -_sum);
             string description = GetDescription();
-            Card.AddTransactionWithCardToHistory(instance, DateTime.Now, description, -_sum, _card);
+            var card = new Card(instance);
+            card.AddTransactionWithCardToHistory(DateTime.Now, description, -_sum, _card);
             ForConsoleOperations.ShowResultOfOperation(description);
         }
 

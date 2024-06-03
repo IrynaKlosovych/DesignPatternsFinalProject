@@ -26,7 +26,9 @@ do
     }
     else
     {
-        if (Phone.IsExistPhoneInDB(database, phoneNumber))
+        var phoneService = new Phone(database);
+
+        if (phoneService.IsExistPhoneInDB(phoneNumber))
         {
             Console.WriteLine("Акаунт уже існує");
             string pass = CheckPass();
