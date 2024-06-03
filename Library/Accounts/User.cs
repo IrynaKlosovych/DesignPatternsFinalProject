@@ -27,13 +27,12 @@ namespace Library.Accounts
 
         public static User Registry(DataBase instance, string phoneNumber, string pass)
         {
-            string query = "UPDATE MyUser SET pass = @pass WHERE id_tel = (SELECT id_phone FROM Phone WHERE phone_number = @phone)";
             SqlParameter[] parameters = new SqlParameter[]
             {
             new SqlParameter("@pass", pass),
             new SqlParameter("@phone", phoneNumber)
             };
-            instance.InsertUpdateDeleteData(query, parameters);
+            instance.InsertUpdateDeleteData(SqlQueries.IsExistPhoneInDBQuery, parameters);
             DataTable result = TakeUser(instance, phoneNumber, pass);
             return CreateUserFromDataTable(result, phoneNumber);
         }
@@ -46,14 +45,13 @@ namespace Library.Accounts
 
         private static DataTable TakeUser(DataBase instance, string phoneNumber, string pass)
         {
-            string checkQuery = "SELECT u.id_user, surname, name FROM MyUser u INNER JOIN Phone p ON u.id_tel = p.id_phone WHERE p.phone_number = @PhoneNumber AND u.pass = @password;";
             SqlParameter[] newParameters = new SqlParameter[]
             {
             new SqlParameter("@PhoneNumber", phoneNumber),
             new SqlParameter("@password", pass)
             };
 
-            DataTable result = instance.SelectData(checkQuery, newParameters);
+            DataTable result = instance.SelectData(SqlQueries.CheckUserQuery, newParameters);
             return result;
         }
 
@@ -74,7 +72,6 @@ namespace Library.Accounts
 
         public static Dictionary<bool, int> CheckHomeUser(DataBase instance, string city, string street, string home)
         {
-            string checkQuery = "select id_residence from Residence where city = @city and street = @street and home = @home";
             SqlParameter[] newParameters = new SqlParameter[]
             {
             new SqlParameter("@city", city),
@@ -82,7 +79,7 @@ namespace Library.Accounts
             new SqlParameter("@home", home)
             };
 
-            DataTable result = instance.SelectData(checkQuery, newParameters);
+            DataTable result = instance.SelectData(SqlQueries.CheckHomeUserQuery, newParameters);
             Dictionary<bool, int> res = new Dictionary<bool, int>();
             if (result.Rows.Count == 1)
             {
@@ -98,13 +95,12 @@ namespace Library.Accounts
         public static Dictionary<string, string> ShowCommunalForPayment(DataBase instance, int id)
         {
             Dictionary<string, string> resultDictionary = new Dictionary<string, string>();
-            string checkQuery = "select gas, electricity, internet from Residence where id_residence = @id";
             SqlParameter[] newParameters = new SqlParameter[]
             {
             new SqlParameter("@id", id),
             };
 
-            DataTable result = instance.SelectData(checkQuery, newParameters);
+            DataTable result = instance.SelectData(SqlQueries.ShowCommunalForPaymentQuery, newParameters);
             if (result.Rows.Count == 1)
             {
                 resultDictionary["gas"] = result.Rows[0]["gas"].ToString()!;

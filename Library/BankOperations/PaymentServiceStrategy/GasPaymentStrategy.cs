@@ -9,38 +9,27 @@ using System.Threading.Tasks;
 
 namespace Library.BankOperations.PaymentServiceStrategy
 {
-    public class GasPaymentStrategy : IServicePaymentStrategy
+    public class GasPaymentStrategy : BasePaymentStrategy
     {
-        private decimal _sum;
-        private int _id;
-        private string _card;
-        private DataBase instance;
         public GasPaymentStrategy(decimal sum, int idResidence, string card, DataBase instance)
+            :base(sum, idResidence, card, instance)
         {
-            _sum = sum;
-            _id = idResidence;
-            _card = card;
-            this.instance = instance;
+
         }
-        public void Pay()
+
+        protected override void ExecutePayment()
         {
-            PayGas();
-            BankOperations.UpdateMoney(instance, _card, -_sum);
-            string description = $"Ви сплатили {_sum} за газ";
-            Card.AddTransactionWithCardToHistory(instance,
-                    DateTime.Now, description,
-                    -_sum, _card);
-            ForConsoleOperations.ShowResultOfOperation(description);
-        }
-        private void PayGas()
-        {
-            string query = "update Residence set gas = gas + @sum where id_residence = @id";
             SqlParameter[] parameters = new SqlParameter[]
-           {
-            new SqlParameter("@sum", _sum),
-            new SqlParameter("@id", _id)
-           };
-            instance.InsertUpdateDeleteData(query, parameters);
+            {
+                new SqlParameter("@sum", _sum),
+                new SqlParameter("@id", _id)
+            };
+            instance.InsertUpdateDeleteData(SqlQueries.PayGasQuery, parameters);
+        }
+
+        protected override string GetDescription()
+        {
+            return $"Ви сплатили {_sum} за газ";
         }
     }
 }
