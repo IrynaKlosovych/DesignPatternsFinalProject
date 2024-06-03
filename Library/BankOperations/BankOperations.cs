@@ -36,6 +36,8 @@ namespace Library.BankOperations
                 foreach (DataRow row in result.Rows)
                 {
                     string card = row["card_number"].ToString()!;
+                    if(card == null)
+                        throw new Exception();
                     decimal balance = Convert.ToDecimal(row["balance"]);
                     cardBalance[card] = balance;
                 }

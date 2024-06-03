@@ -26,7 +26,7 @@ namespace Library.Accounts
                 new SqlParameter("@pass", pass),
                 new SqlParameter("@phone", phoneNumber)
             };
-            database.InsertUpdateDeleteData(SqlQueries.IsExistPhoneInDBQuery, parameters);
+            database.InsertUpdateDeleteData(SqlQueries.RegistryUserQuery, parameters);
             DataTable result = TakeUser(database, phoneNumber, pass);
             return CreateUserFromDataTable(result, phoneNumber);
         }

@@ -20,6 +20,7 @@ namespace Library.BankOperations.Handlers.Steps
         {
             if (request == "2")
             {
+               
                 string ownCard = consoleOperations.ChooseOwnCard();
                 string anotherCard = consoleOperations.ChooseAnotherCard();
 

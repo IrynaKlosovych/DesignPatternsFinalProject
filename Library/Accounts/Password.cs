@@ -8,6 +8,7 @@ namespace Library.Accounts
 {
     public static class Password
     {
+        private static readonly int _minimumLength;
         public static bool IsValidPass(string? password)
         {
             if (string.IsNullOrEmpty(password))
@@ -15,12 +16,7 @@ namespace Library.Accounts
                 return false;
             }
 
-            return HasMinimumLength(password, 7) && HasLetterAndDigit(password);
-        }
-
-        private static bool HasMinimumLength(string password, int minLength)
-        {
-            return password.Length >= minLength;
+            return password.Length >= _minimumLength && HasLetterAndDigit(password);
         }
 
         private static bool HasLetterAndDigit(string password)
