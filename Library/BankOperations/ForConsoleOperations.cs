@@ -13,13 +13,14 @@ namespace Library.BankOperations
     public class ForConsoleOperations
     {
         public User UserInfo { get; private set; }
-        public DataBase Instance { get; private set; }
-        public ForConsoleOperations(User user, DataBase instance) {
+        public IDataBase Instance { get; private set; }
+        public ForConsoleOperations(User user, IDataBase instance) {
             UserInfo = user;
             Instance = instance;
         }
-        public void ShowCardBalance(Dictionary<string, decimal> cardBalance) {
-            foreach(var card in cardBalance)
+        public void ShowCardBalance(Dictionary<string, decimal> cardBalance)
+        {
+            foreach (var card in cardBalance)
             {
                 Console.WriteLine($"На картці {card.Key} {card.Value} грн");
             }
@@ -27,19 +28,22 @@ namespace Library.BankOperations
 
         public string ChooseOwnCard()
         {
-            string resultCard="";
+            string resultCard = "";
             string? card;
             bool ok = false;
+            var cardService = new Card(Instance);
+
             do
             {
                 Console.WriteLine("Оберіть свою картку:");
                 card = Console.ReadLine();
                 if (card != null)
                 {
-                    ok = Card.CheckOwnCard(Instance, card, UserInfo.Id);
+                    ok = cardService.CheckOwnCard(card, UserInfo.Id);
                     if (ok) resultCard = card;
                 }
             } while (!ok);
+
             return resultCard;
         }
 
@@ -48,16 +52,19 @@ namespace Library.BankOperations
             string resultCard = "";
             string? card;
             bool ok = false;
+            var cardService = new Card(Instance);
+
             do
             {
                 Console.WriteLine("Оберіть картку, куди перекидаєте кошти:");
                 card = Console.ReadLine();
                 if (card != null)
                 {
-                    ok = Card.IsExistAnotherCard(Instance, card);
+                    ok = cardService.IsExistAnotherCard(card);
                     if (ok) resultCard = card;
                 }
             } while (!ok);
+
             return resultCard;
         }
         public decimal ChooseSumForTransaction()
@@ -84,21 +91,24 @@ namespace Library.BankOperations
 
         public string ChoosePhoneNumber()
         {
-            string resultPhone= "";
+            string resultPhone = "";
             string? phone;
             bool ok = false;
+            var phoneService = new Phone(Instance);
+
             do
             {
                 Console.WriteLine("Оберіть номер телефону, який поповнюєте:");
                 phone = Console.ReadLine();
                 if (phone != null)
                 {
-                    ok = Phone.CheckPhone(Instance, phone);
+                    ok = phoneService.CheckPhone(phone);
                     if (ok) resultPhone = phone;
                 }
             } while (!ok);
+
             return resultPhone;
-        } 
+        }
         public string ChoosePinCode()
         {
             string resultPin = "";

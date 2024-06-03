@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Library.DB;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -19,7 +20,7 @@ namespace Library.BankOperations.Handlers.Steps
         {
             if (request == "6")
             {
-                DataTable dataTable = BankOperations.ShowHistory(consoleOperations.Instance, consoleOperations.UserInfo.Id);
+                DataTable dataTable = BankOperations.ShowHistory((DataBase)consoleOperations.Instance, consoleOperations.UserInfo.Id);
                 consoleOperations.ShowHistory(dataTable);
             }
             else

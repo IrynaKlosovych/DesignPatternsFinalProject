@@ -1,4 +1,5 @@
 ﻿using Library.Accounts;
+using Library.DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,23 +23,23 @@ namespace Library.BankOperations.Handlers.Steps
                 string ownCard = consoleOperations.ChooseOwnCard();
                 string phoneNumber = consoleOperations.ChoosePhoneNumber();
 
-                decimal cardBalance = Card.TakeBalanceFromCard(consoleOperations.Instance, ownCard, consoleOperations.UserInfo.Id);
+                var cardService = new Card(consoleOperations.Instance);
+                decimal cardBalance = cardService.TakeBalanceFromCard(ownCard, consoleOperations.UserInfo.Id);
                 decimal sumForTransaction;
                 do
                 {
                     sumForTransaction = consoleOperations.ChooseSumForTransaction();
                 } while (sumForTransaction > cardBalance);
 
-                BankOperations.UpdateMoney(consoleOperations.Instance, ownCard, -sumForTransaction);
-                Phone.AddMoneyToPhone(consoleOperations.Instance, phoneNumber, sumForTransaction);
+                BankOperations.UpdateMoney((DataBase)consoleOperations.Instance, ownCard, -sumForTransaction);
 
-                string owndescription = $"Ви переказали {sumForTransaction} грн на номер телефону {phoneNumber}";
+                var phoneService = new Phone(consoleOperations.Instance);
+                phoneService.AddMoneyToPhone(phoneNumber, sumForTransaction);
 
-                Card.AddTransactionWithCardToHistory(consoleOperations.Instance,
-                    DateTime.Now, owndescription,
-                    -sumForTransaction, ownCard);
+                string description = $"Ви поповнили номер {phoneNumber} на {sumForTransaction} грн";
+                cardService.AddTransactionWithCardToHistory(DateTime.Now, description, -sumForTransaction, ownCard);
 
-                ForConsoleOperations.ShowResultOfOperation(owndescription);
+                ForConsoleOperations.ShowResultOfOperation(description);
             }
             else
             {

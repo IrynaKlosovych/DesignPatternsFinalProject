@@ -9,36 +9,36 @@ using System.Data;
 
 namespace Library.DB
 {
-    public sealed class DataBase
+    public sealed class DataBase : IDataBase
     {
         private static DataBase? _instance;
-        private static object _refObj = new object();
+        private static readonly object _refObj = new object();
         private readonly string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnection"].ConnectionString;
-        private SqlConnection connection;
-
-        public static DataBase GetInstance()
-        {
-            if (DataBase._instance == null)
-            {
-                lock (DataBase._refObj)
-                {
-                    if (DataBase._instance == null)
-                    {
-                        DataBase._instance = new DataBase();
-                    }
-                }
-            }
-            return DataBase._instance;
-        }
+        private readonly SqlConnection connection;
 
         private DataBase()
         {
             connection = new SqlConnection(connectionString);
         }
 
+        public static DataBase GetInstance()
+        {
+            if (_instance == null)
+            {
+                lock (_refObj)
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new DataBase();
+                    }
+                }
+            }
+            return _instance;
+        }
+
         public void OpenConnection()
         {
-            if (connection.State != System.Data.ConnectionState.Open)
+            if (connection.State != ConnectionState.Open)
             {
                 connection.Open();
             }
@@ -46,25 +46,28 @@ namespace Library.DB
 
         public void CloseConnection()
         {
-            if (connection != null && connection.State == System.Data.ConnectionState.Open)
+            if (connection != null && connection.State == ConnectionState.Open)
             {
                 connection.Close();
             }
         }
+
         public DataTable SelectData(string sqlQuery, SqlParameter[]? parameters = null)
         {
             DataTable dataTable = new DataTable();
             try
             {
                 OpenConnection();
-                SqlCommand cmd = new SqlCommand(sqlQuery, connection);
-                if (parameters != null)
+                using (SqlCommand cmd = new SqlCommand(sqlQuery, connection))
                 {
-                    cmd.Parameters.AddRange(parameters);
-                }
-                using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
-                {
-                    adapter.Fill(dataTable);
+                    if (parameters != null)
+                    {
+                        cmd.Parameters.AddRange(parameters);
+                    }
+                    using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                    {
+                        adapter.Fill(dataTable);
+                    }
                 }
             }
             catch (Exception ex)
@@ -83,14 +86,16 @@ namespace Library.DB
             try
             {
                 OpenConnection();
-                SqlCommand cmd = new SqlCommand(query, connection);
-                if (parameters != null)
+                using (SqlCommand cmd = new SqlCommand(query, connection))
                 {
-                    cmd.Parameters.AddRange(parameters);
+                    if (parameters != null)
+                    {
+                        cmd.Parameters.AddRange(parameters);
+                    }
+                    cmd.ExecuteNonQuery();
                 }
-                cmd.ExecuteNonQuery();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new Exception(ex.Message);
             }

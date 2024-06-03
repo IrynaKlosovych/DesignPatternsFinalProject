@@ -10,6 +10,7 @@ namespace Library.BankOperations.Handlers.Steps
     public class ChangePinCode:BaseHandler
     {
         private ForConsoleOperations consoleOperations;
+
         public ChangePinCode(ForConsoleOperations console)
         {
             consoleOperations = console;
@@ -20,11 +21,9 @@ namespace Library.BankOperations.Handlers.Steps
             if (request == "5")
             {
                 string ownCard = consoleOperations.ChooseOwnCard();
-
                 string pincode = consoleOperations.ChoosePinCode();
-
-                Card.ChangePin(consoleOperations.Instance, pincode, ownCard);
-
+                var card = new Card(consoleOperations.Instance);
+                card.ChangePin(pincode, ownCard);
                 string description = $"Ви змінили пінкод на картці {ownCard}";
                 ForConsoleOperations.ShowResultOfOperation(description);
             }

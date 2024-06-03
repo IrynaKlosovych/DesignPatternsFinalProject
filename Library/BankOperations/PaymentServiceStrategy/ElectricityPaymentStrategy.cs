@@ -11,7 +11,7 @@ namespace Library.BankOperations.PaymentServiceStrategy
 {
     public class ElectricityPaymentStrategy : BasePaymentStrategy
     {
-        public ElectricityPaymentStrategy(decimal sum, int idResidence, string card, DataBase instance)
+        public ElectricityPaymentStrategy(decimal sum, int idResidence, string card, IDataBase instance)
             : base(sum, idResidence, card, instance)
         {
         }

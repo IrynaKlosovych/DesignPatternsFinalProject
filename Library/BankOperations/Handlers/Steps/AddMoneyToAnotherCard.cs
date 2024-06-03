@@ -1,4 +1,5 @@
 ﻿using Library.Accounts;
+using Library.DB;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,30 +21,24 @@ namespace Library.BankOperations.Handlers.Steps
             if (request == "2")
             {
                 string ownCard = consoleOperations.ChooseOwnCard();
-
                 string anotherCard = consoleOperations.ChooseAnotherCard();
 
-                decimal cardBalance = Card.TakeBalanceFromCard(consoleOperations.Instance, ownCard, consoleOperations.UserInfo.Id);
+                var cardService = new Card(consoleOperations.Instance);
+                decimal cardBalance = cardService.TakeBalanceFromCard(ownCard, consoleOperations.UserInfo.Id);
                 decimal sumForTransaction;
                 do
                 {
                     sumForTransaction = consoleOperations.ChooseSumForTransaction();
                 } while (sumForTransaction > cardBalance);
 
-                BankOperations.UpdateMoney(consoleOperations.Instance, ownCard, -sumForTransaction);
-
-                BankOperations.UpdateMoney(consoleOperations.Instance, anotherCard, sumForTransaction);
+                BankOperations.UpdateMoney((DataBase)consoleOperations.Instance, ownCard, -sumForTransaction);
+                BankOperations.UpdateMoney((DataBase)consoleOperations.Instance, anotherCard, sumForTransaction);
 
                 string owndescription = $"Ви переказали {sumForTransaction} грн на картку {anotherCard}";
                 string anotherdescription = $"Ви отримали {sumForTransaction} грн на картку {anotherCard}";
 
-                Card.AddTransactionWithCardToHistory(consoleOperations.Instance,
-                    DateTime.Now, owndescription,
-                    -sumForTransaction, ownCard);
-
-                Card.AddTransactionWithCardToHistory(consoleOperations.Instance,
-                    DateTime.Now, anotherdescription,
-                    sumForTransaction, anotherCard);
+                cardService.AddTransactionWithCardToHistory(DateTime.Now, owndescription, -sumForTransaction, ownCard);
+                cardService.AddTransactionWithCardToHistory(DateTime.Now, anotherdescription, sumForTransaction, anotherCard);
 
                 ForConsoleOperations.ShowResultOfOperation(owndescription);
             }

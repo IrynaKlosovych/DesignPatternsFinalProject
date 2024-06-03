@@ -18,12 +18,12 @@ namespace Library.BankOperations.Handlers.Steps
         {
             if (request == "1")
             {
-                var result = BankOperations.CheckBalanceOnAllCards(consoleOperations.Instance, consoleOperations.UserInfo.Id);
+                var result = BankOperations.CheckBalanceOnAllCards((DataBase)consoleOperations.Instance, consoleOperations.UserInfo.Id);
                 consoleOperations.ShowCardBalance(result);
             }
             else
             {
-               base.Handle(request);
+                base.Handle(request);
             }
         }
     }
